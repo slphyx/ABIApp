@@ -2,19 +2,23 @@
 % Please edit documentation in R/run_app_ABI.R
 \name{run_app_ABI}
 \alias{run_app_ABI}
-\title{Run the standalone version}
+\title{Run the ABI Shiny Application}
 \usage{
 run_app_ABI(options = list())
 }
 \arguments{
-\item{options}{Named options that should be passed to the runApp call.}
+\item{options}{A named list of options to be passed to the `shinyAppDir` function. Defaults to an empty list.}
 }
 \value{
-Open browser
+Opens the Shiny application in a web browser.
 }
 \description{
-Run the standalone version
+This function launches the standalone version of the ABI Shiny application for helminth species delimitation.
 }
 \examples{
+# Run the ABI application with default settings
 run_app_ABI()
+
+# Run the ABI application with custom options
+run_app_ABI(options = list(port = 8080))
 }

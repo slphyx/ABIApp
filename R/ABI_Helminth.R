@@ -1,38 +1,67 @@
 #' A tool for helminth species delimitation at various taxonomic levels
 #'
-#' @param distance Number >= 0 (From our database the number sh ould be 0.000 - 0.909)
-#' @param group group of Helminth ("NAS","NS","NT","TR","TRD","CE") /n
-#' "NAS" is "Nematode (Ascaridida and Spirurida)" /n
-#' "NS"  is "Nematode (Strongylida)") /n
-#' "NT"  is "Nematode (Trichocephalida)" /n
-#' "TR"  is "Trematode (Plagiorchiida)" /n
-#' "TRD" is "Trematode (Diplostomida)" /n
-#' "CE"  is "Cestode"
-#' @param marker Helminth Genetic Markers
-#' @param Fastafile directory of Fasta file
-#' @param fastaSelect1 Selection of 1st taxon from Fasta file (number or text(label))
-#' @param fastaSelect2 Selection of 2nd taxon from Fasta file (number or text(label))
+#' @param distance Numeric. Number >= 0 (From our database the number should be 0.000 - 0.909).This argument can be used when a `Fastafile` is `NULL`.
+#' @param Fastafile Character. File path to the FASTA file containing sequence data. If this is specified, the user must also provide `fastaSelect1` and `fastaSelect2` to identify taxa within the file. If `Fastafile` is `NULL`, the function will use the `distance` argument instead.
+#' @param fastaSelect1 Character or Numeric. Identifier (label or index) for the 1st taxon in the FASTA file. Required when `Fastafile` is provided.
+#' @param fastaSelect2 Character or Numeric. Identifier (label or index) for the 2nd taxon in the FASTA file. Required when `Fastafile` is provided.
+#' @param group Character. Group of Helminth ("NAS","NS","NT","TR","TRD","CE")
+#' \describe{
+#' • "NAS" is "Nematode (Ascaridida and Spirurida) "
+#' }
+#' \describe{
+#' • "NS"  is "Nematode (Strongylida)"
+#' }
+#' \describe{
+#' • "NT"  is "Nematode (Trichocephalida)"
+#' }
+#' \describe{
+#' • "TR"  is "Trematode (Plagiorchiida)"
+#' }
+#' \describe{
+#' • "TRD" is "Trematode (Diplostomida)"
+#' }
+#' \describe{
+#' • "CE"  is "Cestode"
+#' }
+#' @param marker Character. Helminth Genetic Markers
 #' ("18S rRNA","28S rRNA","ITS1","ITS2","COI","COII","cytB","NAD1","12S rRNA","16S rRNA")
+#' @details
+#' The `ABI_Helminth` function allows users to perform species delimitation of helminths using two approaches:
+#' \describe{
+#' 1. Directly specifying a numeric distance for comparison between taxa.
+#' users can specify a genetic distance (e.g., `distance = 0.05`) to generate visualizations based on predefined relationships.
+#' }
+#' \describe{
+#' 2. Providing a FASTA file containing sequence data for the taxa of interest.
+#' In the second approach, users can input a FASTA file (`Fastafile`) and select specific taxa using their indices or labels (via `fastaSelect1` and `fastaSelect2`) for detailed pairwise comparison. This flexibility enables users to either work with summary-level data or perform detailed analyses using sequence data.
+#' }
 #' @return
-#' Plot of ggplot
+#' Returns a ggplot object visualizing the genetic distance and relationships between the selected taxa.
 #' @export ABI_Helminth
-#'
 #' @examples
+#' # Approach 1: Specify distance directly
+#' # Basic usage
 #' ABI_Helminth()
+#'
+#' # Specify distance only
 #' ABI_Helminth(0.06)
+#'
+#' # Add specify group and marker
 #' ABI_Helminth(0.02,"NS","18S rRNA")
 #' ABI_Helminth(distance = 0.5,group = "CE",marker = "ITS2")
 #'
-#' ##### Fasta file #####
+#' # Approach 2: Use a FASTA file
 #' # Select with numbers
 #' ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
 #' fastaSelect1 = 1, fastaSelect2 = 2
 #' )
-#' # Select with number and text
+#'
+#' # Select with number and text (mixed )
 #' ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
 #' fastaSelect1 = "Label 1", fastaSelect2 = 2
 #' )
-#'# Select with texts
+#'
+#' # Select with text labels
 #' ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
 #' fastaSelect1 = "Label 1", fastaSelect2 = "Label 2"
 #' )
