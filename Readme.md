@@ -2,7 +2,7 @@
 
 ![image](https://img.shields.io/badge/Code-R-blue)
 ![image](https://img.shields.io/badge/Package-R-blue)
-![image](https://img.shields.io/badge/ABI-V%200.3-blue)
+![image](https://img.shields.io/badge/ABI-V%200.4-blue)
 
 ## Overview
 
