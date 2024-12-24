@@ -6,7 +6,7 @@
 
 ## Overview
 
-The **ABI** package provides tools for species delimitation of helminths using genetic distance and visualization methods. It supports analysis of genetic markers such as "18S rRNA," "ITS2," and more. The package also includes a Shiny web app for interactive use.
+The **ABI** package provides tools for species delimitation of helminths using genetic distance and visualization methods.
 
 ---
 
