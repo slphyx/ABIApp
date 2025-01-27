@@ -1,6 +1,6 @@
-Package: ABI
+Package: ABIApp
 Type: Package
-Title: Applying taxonomic Boundaries for species Identification (ABI)
+Title: Applying Taxonomic Boundaries for Species Identification of Helminths (ABIApp)
 Version: 0.4
 Authors@R: 
     person("Sompob", "Saralamba", ,"saralamba@gmail.com" , role = c("aut", "cre"),comment = c(ORCID = "0000-0002-5460-8447" ,GitHub="https://github.com/slphyx"))
