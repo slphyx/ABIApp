@@ -1,4 +1,4 @@
-#' Run the ABI Shiny Application
+#' Run the ABIApp Shiny Application
 #'
 #' This function launches the standalone version of the ABI Shiny application for helminth species delimitation.
 #'
@@ -7,13 +7,13 @@
 #' @export
 #'
 #' @examples
-#' # Run the ABI application with default settings
-#' run_app_ABI()
+#' # Run the ABIApp application with default settings
+#' run_ABIApp()
 #'
 #' # Run the ABI application with custom options
-#' run_app_ABI(options = list(port = 8080))
+#' run_ABIApp(options = list(port = 8080))
 
-run_app_ABI <- function(options = list()) {
-  app_dir <- system.file("ABI", package = "ABI")
+run_ABIApp <- function(options = list()) {
+  app_dir <- system.file("ABIApp", package = "ABIApp")
   shiny::shinyAppDir(app_dir, options = options)
 }
