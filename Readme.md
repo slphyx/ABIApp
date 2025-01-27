@@ -46,14 +46,14 @@ install_github("slphyx/ABIApp")
 ### Launch the Shiny App
 The ABIApp package includes an interactive Shiny web application for helminth analysis. You can launch it using the following command:
 ```{r}
-ABI::run_app_ABIApp()
+ABI::run_ABIApp()
 ```
 
 or
 
 ```{r}
 library(ABIApp)
-run_app_ABIApp()
+run_ABIApp()
 ```
 In the web app, it has "Quick Guidelines" for using the app.
 This opens an interactive interface where you can upload data, perform analyses, and visualize results.
