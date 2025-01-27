@@ -1,4 +1,4 @@
-# ABI: A Tool for Helminth Species Delimitation
+# ABIApp: Applying Taxonomic Boundaries for Species Identification of Helminths 
 
 ![image](https://img.shields.io/badge/Code-R-blue)
 ![image](https://img.shields.io/badge/Package-R-blue)
@@ -6,7 +6,7 @@
 
 ## Overview
 
-The **ABI** package provides tools for species delimitation of helminths using genetic distance and visualization methods.
+The **ABIApp** package provides tools for species delimitation of helminths using genetic distance and visualization methods.
 
 ---
 
@@ -14,7 +14,7 @@ The **ABI** package provides tools for species delimitation of helminths using g
 
 ### Required Package: **ggtree**
 
-The ABI package depends on the `ggtree` package for generating phylogenetic trees. You must install `ggtree` before installing the ABI package.
+The ABIApp package depends on the `ggtree` package for generating phylogenetic trees. You must install `ggtree` before installing the ABI package.
 
 Install `ggtree` from Bioconductor:
 
@@ -26,7 +26,7 @@ BiocManager::install("ggtree")
 ```
 
 ## Install Package
-Install the ABI package directly from GitHub using the devtools package.
+Install the ABIApp package directly from GitHub using the devtools package.
 
 ```{r}
 install.packages("devtools")
@@ -44,23 +44,23 @@ install_github("slphyx/ABIApp")
 
 ## How to Use
 ### Launch the Shiny App
-The ABI package includes an interactive Shiny web application for helminth analysis. You can launch it using the following command:
+The ABIApp package includes an interactive Shiny web application for helminth analysis. You can launch it using the following command:
 ```{r}
-ABI::run_app_ABI()
+ABI::run_app_ABIApp()
 ```
 
 or
 
 ```{r}
-library(ABI)
-run_app_ABI()
+library(ABIApp)
+run_app_ABIApp()
 ```
 In the web app, it has "Quick Guidelines" for using the app.
 This opens an interactive interface where you can upload data, perform analyses, and visualize results.
 
 ## Use function 
 
-The ABI package includes core R functions for helminth species delimitation. Below are some examples:
+The ABIApp package includes core R functions for helminth species delimitation. Below are some examples:
 ```{r}
 # Basic usage
 ABI_Helminth()
