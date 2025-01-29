@@ -314,13 +314,33 @@ ui <- dashboardPage(
                  tabName = "fasta_file",
                  h2("Fasta file"),
                  tags$br(),
+
                  fluidRow(
-                 column(9, fileInput("fastaFile", "Upload File:", width = "500px", accept = ".fasta")),
-                 column(3, uiOutput("distanceText")),
-                 column(6, selectizeInput("fastaSelect1", "Sequence ID of queried sequence (ID name should match name in fasta file):", choices = c(), width = "100%")),
-                 column(6, selectizeInput("fastaSelect2", "Sequence ID of sequence to be compared with (ID name should match name in fasta file):", choices = c(), width = "100%")),
+                   column(12,
+                 tabsetPanel(id="data_input",
+                   tabPanel("Upload File",value=1,
+
+                       column(9, fileInput("fastaFile", "Upload File:", width = "500px", accept = ".fasta")),
+                       column(3, uiOutput("distanceText")),
+
+
+                   ),
+                   tabPanel("Example Data",value=2,
+
+                       column(9, actionButton("Load_example_Data", "Load Example Data")),
+                       column(3, uiOutput("distanceText")),
+                       br(),
+                       br(),
+                       br(),
+                       tableOutput("Example_data_table"),
+                       br(),
+                   ),
+                   column(6, selectizeInput("fastaSelect1", "Sequence ID of queried sequence (ID name should match name in fasta file):", choices = c(), width = "100%")),
+                   column(6, selectizeInput("fastaSelect2", "Sequence ID of sequence to be compared with (ID name should match name in fasta file):", choices = c(), width = "100%")),
+
 
                  )
+                 ))
                ),
 
                # Genetic Distance Tab
@@ -428,6 +448,7 @@ server <- function(input, output,session) {
   useShinyjs()
   values <- reactiveValues()
   values$distance <- NULL
+  values$sequences_example <- NULL
   values$heighttree <- "400px"
   values$displayTable <- F
   values$language <- "EN"
@@ -531,11 +552,12 @@ server <- function(input, output,session) {
   })
   # read Fasta File
   observeEvent(input$fastaFile,{
+    values$load_example <- NULL
     fastaFile <- input$fastaFile
+    values$fastaFile <- input$fastaFile
     sequences <- read.dna(fastaFile$datapath,
                           format = "fasta")
-
-
+    values$fastaFile_name <- rownames(sequences)
     # Convert sequences to distance matrix
     dist_matrix <- dist.dna(sequences, model = "raw")
 
@@ -551,6 +573,7 @@ server <- function(input, output,session) {
 
     colname_genetic <- colnames(values$genetic_distance)
     rowname_genetic <- rownames(values$genetic_distance)
+
     # update Selectize
     updateSelectizeInput(session,
                          "fastaSelect1",
@@ -569,6 +592,115 @@ server <- function(input, output,session) {
 
   })
 
+  # read ex File
+  observeEvent(input$Load_example_Data,{
+    values$load_example <- T
+    fastaFile <- "data/Example_data.fasta"
+    sequences <- read.dna(fastaFile,
+                          format = "fasta")
+    values$sequences_example <- rownames(sequences)
+    # Convert sequences to distance matrix
+    dist_matrix <- dist.dna(sequences, model = "raw")
+
+    # Construct neighbor-joining tree
+    values$dna_tree <- nj(dist_matrix)
+
+    # Calculate genetic distance between each pair of sequences
+    values$genetic_distance <- cophenetic(values$dna_tree)
+    if(length(values$genetic_distance[1,]) > 16){
+      h <- length(values$genetic_distance[1,])*25
+      values$heighttree <- paste0(h,"px")
+    }
+
+    colname_genetic <- colnames(values$genetic_distance)
+    rowname_genetic <- rownames(values$genetic_distance)
+
+    # update Selectize
+    updateSelectizeInput(session,
+                         "fastaSelect1",
+                         "Sequence ID of queried sequence(ID name should match name in fasta file):",
+                         choices=c(colname_genetic),
+
+    )
+
+    # update Selectize
+    updateSelectizeInput(session,
+                         "fastaSelect2",
+                         "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
+                         choices=c(rowname_genetic),
+                         selected = tail(rowname_genetic, 1)
+    )
+
+  })
+  output$Example_data_table <- renderTable({
+    data.frame(Label1=values$sequences_example[1:13],
+               Label2=values$sequences_example[14:26])
+  })
+
+  observeEvent(input$data_input,{
+    values$load_example <- NULL
+    values$sequences_example <- NULL
+    values$displayTable <- F
+    if(input$data_input=="2"){
+      values$fastaFile <- NULL
+    }else if(!is.null(input$fastaFile)){
+      values$fastaFile <- input$fastaFile
+    }else{
+      values$fastaFile <- NULL
+    }
+    if(!is.null(values$fastaFile_name)&!is.null(values$fastaSelect1) & !is.null(values$fastaSelect2) & input$data_input=="1"){
+      # update Selectize
+      updateSelectizeInput(session,
+                           "fastaSelect1",
+                           "Sequence ID of queried sequence(ID name should match name in fasta file):",
+                           choices=c(values$fastaFile_name),
+                           selected = values$fastaSelect1
+
+      )
+
+      # update Selectize
+      updateSelectizeInput(session,
+                           "fastaSelect2",
+                           "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
+                           choices=c(values$fastaFile_name),
+                           selected = values$fastaSelect2
+      )
+    }else if(!is.null(values$fastaFile_name)& input$data_input=="1"){
+      # update Selectize
+      updateSelectizeInput(session,
+                           "fastaSelect1",
+                           "Sequence ID of queried sequence(ID name should match name in fasta file):",
+                           choices=c(values$fastaFile_name)
+
+      )
+
+      # update Selectize
+      updateSelectizeInput(session,
+                           "fastaSelect2",
+                           "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
+                           choices=c(values$fastaFile_name),
+                           selected = tail(values$fastaFile_name, 1)
+      )
+    }
+    else{
+    # update Selectize
+    updateSelectizeInput(session,
+                         "fastaSelect1",
+                         "Sequence ID of queried sequence(ID name should match name in fasta file):",
+                         choices=c(""),
+                         selected = NULL
+    )
+
+    # update Selectize
+    updateSelectizeInput(session,
+                         "fastaSelect2",
+                         "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
+                         choices=c(""),
+                         selected = NULL
+
+    )
+    }
+  })
 
   # plot tree
   output$treeplot <- renderPlot({
@@ -587,7 +719,7 @@ server <- function(input, output,session) {
   })
 
   output$treeOutput <- renderUI({
-    req(!is.null(input$fastaFile))
+    req(!is.null(values$fastaFile) | !is.null(values$load_example))
     tagList(
       fluidRow(
 
@@ -621,15 +753,21 @@ server <- function(input, output,session) {
 
   observeEvent(c(input$submit,input$fastaSelect1,
                  input$fastaSelect2,input$group,input$marker),{
-                   if(input$sidebarMenu == "fasta_file" && !is.null(input$fastaFile)){
+                   if(input$sidebarMenu == "fasta_file" && (!is.null(values$fastaFile))| !is.null(values$load_example)){
                      HTML(paste("<h4>Error
                          </h4>"))
                    }
-                   req((input$sidebarMenu == "fasta_file" && !is.null(input$fastaFile)) || input$sidebarMenu == "genetic_distance")
+
+                   req((input$sidebarMenu == "fasta_file" && (!is.null(values$fastaFile))) || input$sidebarMenu == "genetic_distance" || !is.null(values$load_example))
                    # values$level <- input$level
+                   values$load_example <- T
                    values$displayTable <-T
                    values$distance <- 0
                    values$distance_fasta_max <- 0
+                   if(input$data_input=="1"){
+                   values$fastaSelect1 <- input$fastaSelect1
+                   values$fastaSelect2 <- input$fastaSelect2
+                   }
                    #Fasta file
                    if(input$sidebarMenu == "fasta_file"){
 
@@ -737,7 +875,7 @@ server <- function(input, output,session) {
                  })
 
   output$distanceText <- renderUI({
-    req(!is.null(input$fastaFile))
+    req(!is.null(values$fastaFile) | !is.null(values$load_example))
     distance <- NULL
     if(!is.null(values$distance)) distance <- round(values$distance,3)
     paste0()
@@ -748,9 +886,11 @@ server <- function(input, output,session) {
     )
   })
 
+
+
   output$tabsOutput <- renderUI({
     if(input$sidebarMenu == "fasta_file" && values$displayTable){
-      req(!is.null(input$fastaFile))
+      req(!is.null(values$fastaFile) | !is.null(values$load_example))
       tagList(
 
         tabsetPanel(

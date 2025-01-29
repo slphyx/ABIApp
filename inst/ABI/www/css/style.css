@@ -13,6 +13,10 @@ p,h1,h2,h3,h4,h5,h6,span,a {
     padding: 15px;
 }
 
+div#shiny-tab-fasta_file div.tab-content{
+  border : 0px !important;
+}
+
 
 input[type=checkbox] {
   transform: scale(1.5);
