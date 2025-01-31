@@ -3,6 +3,15 @@
     font-weight: 900;
 }
 
+.upload-error {
+  color: red;
+  font-weight: bold;
+}
+
+div#message{
+  color: #b22;
+}
+
 p,h1,h2,h3,h4,h5,h6,span,a {
   font-family: 'Noto Sans JP', sans-serif !important;
 }

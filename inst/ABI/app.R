@@ -24,6 +24,12 @@ library(seqinr)
 library(ape)
 library(ggtree)
 
+# Set Max upload size 2 MB
+# options(shiny.maxRequestSize = 10 * 1024^2)
+
+# progress-bar Message
+
+
 flag.choose <- function(language) {
   switch(language,
          EN = "./img/gb.png",
@@ -237,6 +243,18 @@ ui <- dashboardPage(
   # Body
   dashboardBody(
     useShinyjs(),
+    #progress bar text
+    tags$head(
+      tags$script(HTML("
+      Shiny.addCustomMessageHandler('updateProgressBar', function(data) {
+        var progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+          progressBar.innerText = data.message;
+          progressBar.style.backgroundColor = data.color;
+        }
+      });
+    "))
+    ),
     includeCSS("./www/css/style.css"),
     tags$link(
       href = "https://fonts.googleapis.com",
@@ -319,22 +337,28 @@ ui <- dashboardPage(
                    column(12,
                  tabsetPanel(id="data_input",
                    tabPanel("Upload File",value=1,
-
-                       column(9, fileInput("fastaFile", "Upload File:", width = "500px", accept = ".fasta")),
+                       column(9, fileInput("fastaFile", "Upload File:", width = "500px", accept = ".fasta"),
+                              textOutput("message"),                   br(),
+                              br(),
+                              ),
                        column(3, uiOutput("distanceText")),
 
 
                    ),
                    tabPanel("Example Data",value=2,
 
-                       column(9, actionButton("Load_example_Data", "Load Example Data")),
-                       column(3, uiOutput("distanceText")),
-                       br(),
-                       br(),
-                       br(),
-                       tableOutput("Example_data_table"),
+                       column(9,
+                              actionButton("Load_example_Data", "Load Example Data"),
+                              br(),
+                              br(),
+                              tags$a("Example Data File!", href = "Ex/Example_data.fasta"),
+                              br(),
+                              br(),
+                              ),
+                       column(3, uiOutput("distanceText_ex")),
                        br(),
                    ),
+
                    column(6, selectizeInput("fastaSelect1", "Sequence ID of queried sequence (ID name should match name in fasta file):", choices = c(), width = "100%")),
                    column(6, selectizeInput("fastaSelect2", "Sequence ID of sequence to be compared with (ID name should match name in fasta file):", choices = c(), width = "100%")),
 
@@ -389,7 +413,7 @@ ui <- dashboardPage(
              h4(
                # Contact Information
                tags$p(
-                 h4("Dr. Abigail Hui En Chan"),
+                 tags$h4(tags$a("Dr. Abigail Hui En Chan", href = "https://www.researchgate.net/profile/Abigail-Chan-4", target = "_blank")),
                  "2nd floor Santasiri Sornmani Building,Department of Helminthology,",
                  br(),
                  "Faculty of Tropical Medicine,  Mahidol University,",
@@ -421,19 +445,19 @@ ui <- dashboardPage(
                style = "width: 100%; border-collapse: collapse; border-style: none;",
                tags$tbody(
                  tags$tr(
-                   tags$td(tags$b("Abigail Hui En Chan"), style = "text-align: left; padding: 8px;"),
+                   tags$td(tags$b(tags$a("Abigail Hui En Chan", href = "https://www.researchgate.net/profile/Abigail-Chan-4", target = "_blank")), style = "text-align: left; padding: 8px;"),
                    tags$td("Department of Helminthology, Faculty of Tropical Medicine", style = "padding: 8px;")
                  ),
                  tags$tr(
-                   tags$td(tags$b("Urusa Thaenkham"), style = "padding: 8px;"),
+                   tags$td(tags$b(tags$a("Urusa Thaenkham", href = "https://www.tm.mahidol.ac.th/tropmed-staff/Urusa-Thaenkham.php", target = "_blank")), style = "padding: 8px;"),
                    tags$td("Department of Helminthology, Faculty of Tropical Medicine", style = "padding: 8px;")
                  ),
                  tags$tr(
-                   tags$td(tags$b("Tanaphum Wichaita"), style = "padding: 8px;"),
+                   tags$td(tags$b(tags$a("Tanaphum Wichaita", href = "https://orcid.org/0000-0002-4001-8999", target = "_blank")), style = "padding: 8px;"),
                    tags$td("Mahidol Oxford Tropical Medicine Research Unit", style = "padding: 8px;")
                  ),
                  tags$tr(
-                   tags$td(tags$b("Sompob Saralamba"), style = "padding: 8px;"),
+                   tags$td(tags$b(tags$a("Sompob Saralamba", href = "https://www.tropicalmedicine.ox.ac.uk/team/sompob-saralamba", target = "_blank")), style = "padding: 8px;"),
                    tags$td("Mahidol Oxford Tropical Medicine Research Unit", style = "padding: 8px;")
                  )
                )
@@ -550,9 +574,79 @@ server <- function(input, output,session) {
       hide("genetic_distance_input")
     }
   })
+  observe({
+    if (is.null(input$fastaFile)) {
+      session$sendCustomMessage("updateProgressBar", list(message = "Maximum upload size exceeded", color = "red"))
+    }
+  })
   # read Fasta File
   observeEvent(input$fastaFile,{
     values$load_example <- NULL
+    values$displayTable <-F
+    values$fastaFile <- input$fastaFile
+
+    # Attempt to read the FASTA file
+    fasta_data <- tryCatch({
+      read.FASTA(input$fastaFile$datapath)
+    }, warning = function(w) {
+      NULL  # Ignore warnings, return NULL
+    }, error = function(e) {
+      NULL  # Ignore errors, return NULL
+    })
+    # # Check file size (2 MB limit)
+    # if (input$fastaFile$size > 2 * 1024 * 1024) {
+    #   output$message <- renderText("File is too large (must be ≤ 2 MB).")
+    #   session$sendCustomMessage("updateProgressBar", list(message = "Fail upload", color = "red"))
+    #
+    #   values$fastaFile <-NULL
+    #   # update Selectize
+    #   updateSelectizeInput(session,
+    #                        "fastaSelect1",
+    #                        "Sequence ID of queried sequence(ID name should match name in fasta file):",
+    #                        choices=c(""),
+    #                        selected = NULL
+    #   )
+    #
+    #   # update Selectize
+    #   updateSelectizeInput(session,
+    #                        "fastaSelect2",
+    #                        "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
+    #                        choices=c(""),
+    #                        selected = NULL
+    #
+    #   )
+    #   return()  # Stop execution
+    # }else if (input$fastaFile$size <= 2 * 1024 * 1024){
+    #   session$sendCustomMessage("updateProgressBar", list(message = "Upload complete", color = "#337ab7"))
+    #   output$message <- NULL
+    # }
+
+    # Check if reading failed
+    if (is.null(fasta_data) || length(fasta_data) == 0) {
+      output$message <- renderText("Failed to read FASTA file. Please check the format.")
+      session$sendCustomMessage("updateProgressBar", list(message = "Fail upload", color = "red"))
+
+      values$fastaFile <-NULL
+      # update Selectize
+      updateSelectizeInput(session,
+                           "fastaSelect1",
+                           "Sequence ID of queried sequence(ID name should match name in fasta file):",
+                           choices=c(""),
+                           selected = NULL
+      )
+
+      # update Selectize
+      updateSelectizeInput(session,
+                           "fastaSelect2",
+                           "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
+                           choices=c(""),
+                           selected = NULL
+
+      )
+      return()
+    }
+
+
     fastaFile <- input$fastaFile
     values$fastaFile <- input$fastaFile
     sequences <- read.dna(fastaFile$datapath,
@@ -595,7 +689,7 @@ server <- function(input, output,session) {
   # read ex File
   observeEvent(input$Load_example_Data,{
     values$load_example <- T
-    fastaFile <- "data/Example_data.fasta"
+    fastaFile <- "www/Ex/Example_data.fasta"
     sequences <- read.dna(fastaFile,
                           format = "fasta")
     values$sequences_example <- rownames(sequences)
@@ -632,10 +726,7 @@ server <- function(input, output,session) {
     )
 
   })
-  output$Example_data_table <- renderTable({
-    data.frame(Label1=values$sequences_example[1:13],
-               Label2=values$sequences_example[14:26])
-  })
+
 
   observeEvent(input$data_input,{
     values$load_example <- NULL
@@ -648,6 +739,7 @@ server <- function(input, output,session) {
     }else{
       values$fastaFile <- NULL
     }
+
     if(!is.null(values$fastaFile_name)&!is.null(values$fastaSelect1) & !is.null(values$fastaSelect2) & input$data_input=="1"){
       # update Selectize
       updateSelectizeInput(session,
@@ -751,25 +843,31 @@ server <- function(input, output,session) {
            " and " , input$fastaSelect2)
   })
 
-  observeEvent(c(input$submit,input$fastaSelect1,
-                 input$fastaSelect2,input$group,input$marker),{
+  observeEvent(c(input$fastaSelect1,input$fastaSelect2),{
+    req((input$sidebarMenu == "fasta_file" && (!is.null(values$fastaFile) && (input$fastaSelect1 != "") && (input$fastaSelect2 != ""))) || input$sidebarMenu == "genetic_distance" || !is.null(values$load_example))
+    col_Select <- input$fastaSelect1
+    row_Select <- input$fastaSelect2
+    if(input$data_input=="1"){
+      values$fastaSelect1 <- input$fastaSelect1
+      values$fastaSelect2 <- input$fastaSelect2
+    }
+    values$distance <- values$genetic_distance[row_Select,col_Select]
+  })
+
+  observeEvent(c(input$submit),{
                    if(input$sidebarMenu == "fasta_file" && (!is.null(values$fastaFile))| !is.null(values$load_example)){
                      HTML(paste("<h4>Error
                          </h4>"))
                    }
 
-                   req((input$sidebarMenu == "fasta_file" && (!is.null(values$fastaFile))) || input$sidebarMenu == "genetic_distance" || !is.null(values$load_example))
+                   req((input$sidebarMenu == "fasta_file" && (!is.null(values$fastaFile) && (input$fastaSelect1 != "") && (input$fastaSelect2 != ""))) || input$sidebarMenu == "genetic_distance" || !is.null(values$load_example))
                    # values$level <- input$level
                    values$load_example <- T
                    values$displayTable <-T
                    values$distance <- 0
                    values$distance_fasta_max <- 0
-                   if(input$data_input=="1"){
-                   values$fastaSelect1 <- input$fastaSelect1
-                   values$fastaSelect2 <- input$fastaSelect2
-                   }
                    #Fasta file
-                   if(input$sidebarMenu == "fasta_file"){
+                  if(input$sidebarMenu == "fasta_file"){
 
                      col_Select <- input$fastaSelect1
                      row_Select <- input$fastaSelect2
@@ -875,6 +973,18 @@ server <- function(input, output,session) {
                  })
 
   output$distanceText <- renderUI({
+    req(!is.null(values$fastaFile) | !is.null(values$load_example))
+    distance <- NULL
+    if(!is.null(values$distance)) distance <- round(values$distance,3)
+    paste0()
+    tagList(
+      div(id="dtext",
+          p(h5("Distance between taxons:"), distance)
+      )
+    )
+  })
+
+  output$distanceText_ex <- renderUI({
     req(!is.null(values$fastaFile) | !is.null(values$load_example))
     distance <- NULL
     if(!is.null(values$distance)) distance <- round(values$distance,3)
