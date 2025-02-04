@@ -12,6 +12,22 @@ The **ABIApp** package provides tools for species delimitation of helminths usin
 
 ## Prerequisites
 
+Tested with:
+- R version: 4.3.2
+- ape version: 5.8-1
+- BiocManager version : 1.30.25
+- bsplus version: 0.1.4
+- ggtree version: 3.10.1
+- htmltools version: 0.5.8.1
+- markdown version: 1.13
+- seqinr version: 4.2-36
+- shiny version: 1.10.0
+- shinydashboard version: 0.7.2
+- shinyjs version: 2.1.0
+- shinythemes version: 1.2.0
+- shinyWidgets version: 0.8.7
+- stringrversion: 1.5.1
+
 ### Required Package: **ggtree**
 
 The ABIApp package depends on the `ggtree` package for generating phylogenetic trees. You must install `ggtree` before installing the ABI package.
