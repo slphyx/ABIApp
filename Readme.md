@@ -79,13 +79,12 @@ This opens an interactive interface where you can upload data, perform analyses,
 The ABIApp package includes core R functions for helminth species delimitation. Below are some examples:
 ```{r}
 # Basic usage
-ABI_Helminth()
+library(ABIApp)
 
-# Specify distance only
+## Specify distance only
 ABI_Helminth(0.06)
 
-# Add specify group and marker
-ABI_Helminth(0.02,"NS","18S rRNA")
+## Add specify group and marker
 ABI_Helminth(distance = 0.5,group = "CE",marker = "ITS2")
 
 ```
