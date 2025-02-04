@@ -99,25 +99,33 @@ ABI_Helminth(distance = 0.5,group = "CE",marker = "ITS2")
 
 You can use a FASTA file to analyze genetic distances between taxa. Here are some usage examples:
 ```{r}
+# Fastafile Example
+Fastafile <- system.file("ABI/www/Ex/Example_data.fasta", package = "ABIApp")
+
 # Select with numbers
-ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
-fastaSelect1 = 1, fastaSelect2 = 2
+ABI_Helminth(Fastafile=Fastafile,
+             group = "NT",marker = "18S rRNA",
+             fastaSelect1 = 1, fastaSelect2 = 2
 )
 
 # Select with number and text (mixed )
-ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
-fastaSelect1 = "Label 1", fastaSelect2 = 2
+ABI_Helminth(Fastafile=Fastafile,
+             group="NT",marker="18S rRNA",
+             fastaSelect1 = "COI_T_14M.1", fastaSelect2 = 2
 )
 
 # Select with text labels
-ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
-fastaSelect1 = "Label 1", fastaSelect2 = "Label 2"
+ABI_Helminth(Fastafile=Fastafile,
+             group="NT",marker="18S rRNA",
+             fastaSelect1 = "COI_T_14M.1", fastaSelect2 = "KT449823_Trichuris_suis_COI"
 )
 ```
 
 #### Explanation:
 - `Fastafile`: Path to the FASTA file containing genetic sequences.  
-- `fastaSelect1`, `fastaSelect2`: Identify taxa for comparison by index or label.  
+- `fastaSelect1`, `fastaSelect2`: Identify taxa for comparison by index or label.
+- `group`: Taxonomic group of helminths, e.g., "NAS" for nematodes (Ascaridida and Spirurida).  
+- `marker`: Genetic marker for analysis, e.g., "18S rRNA."   
 
 ---
 
