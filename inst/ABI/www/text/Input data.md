@@ -1,5 +1,5 @@
 ####  Input data: 
-The ABIapp requires the following information: an aligned FASTA file or genetic distance value, helminth group of interest, and genetic marker used.
+The ABIapp requires the following information: an aligned FASTA file or genetic distance value, helminth group of interest, and genetic marker used. An example data file (FASTA) is available for download in the ‘Application’ tab.
 
 #### For the aligned FASTA file:
 

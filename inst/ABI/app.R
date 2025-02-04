@@ -24,7 +24,7 @@ library(seqinr)
 library(ape)
 library(ggtree)
 
-# Set Max upload size 2 MB
+# # Set Max upload size 2 MB
 # options(shiny.maxRequestSize = 10 * 1024^2)
 
 # progress-bar Message
@@ -338,7 +338,8 @@ ui <- dashboardPage(
                  tabsetPanel(id="data_input",
                    tabPanel("Upload File",value=1,
                        column(9, fileInput("fastaFile", "Upload File:", width = "500px", accept = ".fasta"),
-                              textOutput("message"),                   br(),
+                              textOutput("message"),
+                              br(),
                               br(),
                               ),
                        column(3, uiOutput("distanceText")),
@@ -351,19 +352,20 @@ ui <- dashboardPage(
                               actionButton("Load_example_Data", "Load Example Data"),
                               br(),
                               br(),
-                              tags$a("Example Data File!", href = "Ex/Example_data.fasta"),
+                              tags$a("Download Example Data File!", href = "Ex/Example_data.fasta"),
                               br(),
                               br(),
                               ),
                        column(3, uiOutput("distanceText_ex")),
                        br(),
                    ),
-
+                 ),
+                 div(class="tab-content",
                    column(6, selectizeInput("fastaSelect1", "Sequence ID of queried sequence (ID name should match name in fasta file):", choices = c(), width = "100%")),
                    column(6, selectizeInput("fastaSelect2", "Sequence ID of sequence to be compared with (ID name should match name in fasta file):", choices = c(), width = "100%")),
+                   )
 
 
-                 )
                  ))
                ),
 
@@ -574,11 +576,11 @@ server <- function(input, output,session) {
       hide("genetic_distance_input")
     }
   })
-  observe({
-    if (is.null(input$fastaFile)) {
-      session$sendCustomMessage("updateProgressBar", list(message = "Maximum upload size exceeded", color = "red"))
-    }
-  })
+  # observe({
+  #   if (is.null(input$fastaFile)) {
+  #     session$sendCustomMessage("updateProgressBar", list(message = "Maximum upload size exceeded", color = "red"))
+  #   }
+  # })
   # read Fasta File
   observeEvent(input$fastaFile,{
     values$load_example <- NULL
@@ -620,31 +622,31 @@ server <- function(input, output,session) {
     #   session$sendCustomMessage("updateProgressBar", list(message = "Upload complete", color = "#337ab7"))
     #   output$message <- NULL
     # }
-
-    # Check if reading failed
-    if (is.null(fasta_data) || length(fasta_data) == 0) {
-      output$message <- renderText("Failed to read FASTA file. Please check the format.")
-      session$sendCustomMessage("updateProgressBar", list(message = "Fail upload", color = "red"))
-
-      values$fastaFile <-NULL
-      # update Selectize
-      updateSelectizeInput(session,
-                           "fastaSelect1",
-                           "Sequence ID of queried sequence(ID name should match name in fasta file):",
-                           choices=c(""),
-                           selected = NULL
-      )
-
-      # update Selectize
-      updateSelectizeInput(session,
-                           "fastaSelect2",
-                           "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
-                           choices=c(""),
-                           selected = NULL
-
-      )
-      return()
-    }
+    #
+    # # Check if reading failed
+    # if (is.null(fasta_data) || length(fasta_data) == 0) {
+    #   output$message <- renderText("Failed to read FASTA file. Please check the format.")
+    #   session$sendCustomMessage("updateProgressBar", list(message = "Fail upload", color = "red"))
+    #
+    #   values$fastaFile <-NULL
+    #   # update Selectize
+    #   updateSelectizeInput(session,
+    #                        "fastaSelect1",
+    #                        "Sequence ID of queried sequence(ID name should match name in fasta file):",
+    #                        choices=c(""),
+    #                        selected = NULL
+    #   )
+    #
+    #   # update Selectize
+    #   updateSelectizeInput(session,
+    #                        "fastaSelect2",
+    #                        "Sequence ID of sequence to be compared with(ID name should match name in fasta file):",
+    #                        choices=c(""),
+    #                        selected = NULL
+    #
+    #   )
+      # return()
+    # }
 
 
     fastaFile <- input$fastaFile
@@ -654,7 +656,12 @@ server <- function(input, output,session) {
     values$fastaFile_name <- rownames(sequences)
     # Convert sequences to distance matrix
     dist_matrix <- dist.dna(sequences, model = "raw")
-
+    if(length(dist_matrix) ==0){
+      output$message <- renderText("Failed to read FASTA file. Please check the format.")
+      return()
+    }else{
+      output$message <-NULL
+    }
     # Construct neighbor-joining tree
     values$dna_tree <- nj(dist_matrix)
 
@@ -852,6 +859,11 @@ server <- function(input, output,session) {
       values$fastaSelect2 <- input$fastaSelect2
     }
     values$distance <- values$genetic_distance[row_Select,col_Select]
+  })
+
+  observeEvent(c(input$group ,input$marker),{
+    req(!is.null(input$group) & !is.null(input$marker))
+    values$displayTable <-F
   })
 
   observeEvent(c(input$submit),{
