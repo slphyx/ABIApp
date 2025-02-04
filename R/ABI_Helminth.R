@@ -147,7 +147,7 @@ MinMax <- function(level, marker, data){
 }
 
 Load.data <- function(group){
-  dir <- system.file(package='ABI')
+  dir <- system.file(package='ABIApp')
   data <- switch(group,
                  NT = read.csv(paste0(dir,'/ABI/data/nematode1.csv')),
                  NAS = read.csv(paste0(dir,'/ABI/data/nematode2.csv')),
