@@ -41,29 +41,34 @@
 #' @examples
 #' # Approach 1: Specify distance directly
 #' # Basic usage
-#' ABI_Helminth()
+#' library(ABIApp)
 #'
 #' # Specify distance only
-#' ABI_Helminth(0.06)
+#' ABI_Helminth(distance = 0.06)
 #'
 #' # Add specify group and marker
-#' ABI_Helminth(0.02,"NS","18S rRNA")
 #' ABI_Helminth(distance = 0.5,group = "CE",marker = "ITS2")
 #'
 #' # Approach 2: Use a FASTA file
+#' # Fastafile Ex
+#' Fastafile <- system.file("ABI/www/Ex/Example_data.fasta", package = "ABIApp")
+#'
 #' # Select with numbers
-#' ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
+#' ABI_Helminth(Fastafile=Fastafile,
+#' group = "NT",marker = "18S rRNA",
 #' fastaSelect1 = 1, fastaSelect2 = 2
 #' )
 #'
 #' # Select with number and text (mixed )
-#' ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
-#' fastaSelect1 = "Label 1", fastaSelect2 = 2
+#' ABI_Helminth(Fastafile=Fastafile,
+#' group="NT",marker="18S rRNA",
+#' fastaSelect1 = "COI_T_14M.1", fastaSelect2 = 2
 #' )
 #'
 #' # Select with text labels
-#' ABI_Helminth(Fastafile="dir/fastaFile.fasta","NT","18S rRNA"
-#' fastaSelect1 = "Label 1", fastaSelect2 = "Label 2"
+#' ABI_Helminth(Fastafile=Fastafile,
+#' group="NT",marker="18S rRNA",
+#' fastaSelect1 = "COI_T_14M.1", fastaSelect2 = "KT449823_Trichuris_suis_COI"
 #' )
 #'
 #' @import ggplot2 stringr utils ape
@@ -310,3 +315,4 @@ ABI_warning <-function(distance,group,marker,distanceBetween){
 
     }
 }
+

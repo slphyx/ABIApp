@@ -14,6 +14,6 @@
 #' run_ABIApp(options = list(port = 8080))
 
 run_ABIApp <- function(options = list()) {
-  app_dir <- system.file("ABIApp", package = "ABIApp")
+  app_dir <- system.file("ABI", package = "ABIApp")
   shiny::shinyAppDir(app_dir, options = options)
 }
