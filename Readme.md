@@ -158,3 +158,8 @@ The ABI package supports the following genetic markers for helminth species deli
 
 ---
 
+## Learn More
+
+To explore the methodology and validation behind ABIApp, please refer to the following publication:
+
+Chan, A.H.E., Thaenkham, U., Wichaita, T., et al. (2025). Validating a web application’s use of genetic distance to determine helminth species boundaries and aid in identification. BMC Bioinformatics, 26, 85. https://doi.org/10.1186/s12859-025-06098-0
